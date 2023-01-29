@@ -2,10 +2,7 @@ package com.driver;
 
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class WhatsappRepository  {
@@ -51,25 +48,57 @@ public class WhatsappRepository  {
 
         //For example: Consider userList1 = {Alex, Bob, Charlie}, userList2 = {Dan, Evan}, userList3 = {Felix, Graham, Hugh}.
         //If createGroup is called for these userLists in the same order, their group names would be "Group 1", "Evan", and "Group 2" respectively.
-        return null;
+        if(users.size()==2){
+            Group group = new Group(users.get(1).getName(), 2);
+            adminMap.put(group, users.get(0));
+            groupUserMap.put(group, users);
+            groupMessageMap.put(group, new ArrayList<Message>());
+            return group;
+        }
+        this.customGroupCount += 1;
+        Group group = new Group(new String("Group "+this.customGroupCount), users.size());
+        adminMap.put(group, users.get(0));
+        groupUserMap.put(group, users);
+        groupMessageMap.put(group, new ArrayList<Message>());
+        return group;
     }
+
     public int createMessage(String content)
     {
         // The 'i^th' created message has message id 'i'.
         // Return the message id.
-        return 0;
+        this.messageId++;
+        Message message= new Message(this.messageId,content);
+        return message.getId();
     }
     public int sendMessage(Message message, User sender, Group group) throws Exception
     {
         //Throw "Group does not exist" if the mentioned group does not exist
         //Throw "You are not allowed to send message" if the sender is not a member of the group
         //If the message is sent successfully, return the final number of messages in that group.
-return 0;
+
+            if(! adminMap.containsKey(group)) throw new Exception("Group does not exist");
+
+            List<User> users = groupUserMap.get(group);
+            Boolean userFound = false;
+            for(User user: users){
+                if(user.equals(sender)){
+                    userFound = true;
+                    break;
+                }
+            }
+            if(userFound == false) throw new Exception("You are not allowed to send message");
+
+            senderMap.put(message, sender);
+            List<Message> messages = groupMessageMap.get(group);
+            messages.add(message);
+            groupMessageMap.put(group, messages);
+            return messages.size();
     }
     public String changeAdmin(User approver, User user, Group group) throws Exception
     {
         //Throw "Group does not exist" if the mentioned group does not exist
-        //Throw "Approver does not have rights" if the approver is not the current admin of the group
+        //Throw "Approve does not have rights" if the approval is not the current admin of the group
         //Throw "User is not a participant" if the user is not a part of the group
         //Change the admin of the group to "user" and return "SUCCESS". Note that at one time there is only one admin and the admin rights are transferred from approver to user.
 return null;
@@ -78,7 +107,7 @@ return null;
     {
         //A user belongs to exactly one group
         //If user is not found in any group, throw "User not found" exception
-        //If user is found in a group and it is the admin, throw "Cannot remove admin" exception
+        //If user is found in a group, and it is the admin, throw "Cannot remove admin" exception
         //If user is not the admin, remove the user from the group, remove all its messages from all the databases, and update relevant attributes accordingly.
         //If user is removed successfully, return (the updated number of users in the group + the updated number of messages in group + the updated number of overall messages)
 return 0;
