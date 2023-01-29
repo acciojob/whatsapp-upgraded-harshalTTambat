@@ -103,41 +103,13 @@ public class WhatsappRepository  {
         //Change the admin of the group to "user" and return "SUCCESS". Note that at one time there is only one admin and the admin rights are transferred from approver to user.
 return null;
     }
-    public int removeUser(User user) throws Exception
-    {
+    public int removeUser(User user) throws Exception {
         //A user belongs to exactly one group
         //If user is not found in any group, throw "User not found" exception
         //If user is found in a group, and it is the admin, throw "Cannot remove admin" exception
         //If user is not the admin, remove the user from the group, remove all its messages from all the databases, and update relevant attributes accordingly.
         //If user is removed successfully, return (the updated number of users in the group + the updated number of messages in group + the updated number of overall messages)
-
-        boolean foundUser = false;
-        String groupName = null;
-        for(Map.Entry<String ,List<User>> map : groupUserHashMap.entrySet()){
-            if( map.getValue().contains(user)){
-                foundUser = true;
-                groupName = map.getKey();
-            }
-        }
-        if(!foundUser){
-            throw new Exception("User not found");
-        }
-        if(adminHashMap.containsValue(user.getMobile())){
-            throw new Exception("Cannot remove admin");
-        }
-        userHashMap.remove(user.getMobile());
-        groupUserHashMap.get(groupName).remove(user);
-        Group group = groupHashMap.get(groupName);
-        group.setNumberOfParticipants(group.getNumberOfParticipants()-1);
-        List<Message> UserMessageList= userMessageHashMap.get(user.getMobile());
-        List<Message> groupMessageList=groupMessageHashMap.get(group.getName());
-        groupMessageList.removeAll(UserMessageList);
-//        for(Message message: UserMessageList){
-//            messageHashMap.remove(message.getId());
-//        }
-        userMessageHashMap.remove(user.getMobile());
-
-        return groupUserHashMap.get(groupName).size()+groupMessageHashMap.get(groupName).size()+messageHashMap.size();
+return 0;
     }
     public String findMessage(Date start, Date end, int K) throws Exception
     {
