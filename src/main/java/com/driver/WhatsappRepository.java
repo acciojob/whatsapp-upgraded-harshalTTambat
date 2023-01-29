@@ -119,7 +119,7 @@ public class WhatsappRepository  {
                 adminMap.put(group, user);
                 return "SUCCESS";
             }
-            throw new Exception("Approve does not have rights");
+            throw new Exception("Approver does not have rights");
     }
     public int removeUser(User user) throws Exception {
         //A user belongs to exactly one group
