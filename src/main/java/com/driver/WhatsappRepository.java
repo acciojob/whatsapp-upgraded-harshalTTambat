@@ -127,7 +127,54 @@ public class WhatsappRepository  {
         //If user is found in a group, and it is the admin, throw "Cannot remove admin" exception
         //If user is not the admin, remove the user from the group, remove all its messages from all the databases, and update relevant attributes accordingly.
         //If user is removed successfully, return (the updated number of users in the group + the updated number of messages in group + the updated number of overall messages)
-return 0;
+
+        Boolean userFound = false;
+        Group userGroup = null;
+        for(Group group: groupUserMap.keySet()){
+            List<User> participants = groupUserMap.get(group);
+            for(User participant: participants){
+                if(participant.equals(user)){
+                    if(adminMap.get(group).equals(user)){
+                        throw new Exception("Cannot remove admin");
+                    }
+                    userGroup = group;
+                    userFound = true;
+                    break;
+                }
+            }
+            if(userFound){
+                break;
+            }
+        }
+        if(userFound){
+            List<User> users = groupUserMap.get(userGroup);
+            List<User> updatedUsers = new ArrayList<>();
+            for(User participant: users){
+                if(participant.equals(user))
+                    continue;
+                updatedUsers.add(participant);
+            }
+            groupUserMap.put(userGroup, updatedUsers);
+
+            List<Message> messages = groupMessageMap.get(userGroup);
+            List<Message> updatedMessages = new ArrayList<>();
+            for(Message message: messages){
+                if(senderMap.get(message).equals(user))
+                    continue;
+                updatedMessages.add(message);
+            }
+            groupMessageMap.put(userGroup, updatedMessages);
+
+            HashMap<Message, User> updatedSenderMap = new HashMap<>();
+            for(Message message: senderMap.keySet()){
+                if(senderMap.get(message).equals(user))
+                    continue;
+                updatedSenderMap.put(message, senderMap.get(message));
+            }
+            senderMap = updatedSenderMap;
+            return updatedUsers.size()+updatedMessages.size()+updatedSenderMap.size();
+        }
+        throw new Exception("User not found");
     }
     public String findMessage(Date start, Date end, int K) throws Exception
     {
